@@ -7,7 +7,7 @@ import { Link, useMatch, useResolvedPath } from "react-router-dom";
 const Navbar = () => {
   return (
     <header>
-      <nav className="nav bg-slate-500 text-white flex justify-between  items-center  gap-8 py-0 px-4">
+      <nav className="nav  bg-amber-400 text-black flex justify-between  items-center  gap-8 py-0 px-4">
         <Link className=" h-full flex  items-center p-4 " to="/">
           WinningXI
         </Link>

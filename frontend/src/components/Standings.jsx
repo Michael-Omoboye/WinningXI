@@ -1,17 +1,30 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-
+import { FormSelect } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 export const Standings = () => {
-  const [epl, setEpl] = useState([]);
-  const [bundesliga, setBundesliga] = useState([]);
-  const [championsleague, setChampionsleague] = useState([]);
-  const fetchDataEpl = async () => {
+  const [leagueData, setLeagueData] = useState([]);
+  const [selectedLeague, setSelectedLeague] = useState("39");
+
+  const leagueOptions = [
+    { value: "39", league: "Premier League" },
+    { value: "78", league: "Bundesliga" },
+    { value: "140", league: "LaLiga" },
+    { value: "61", league: "Ligue 1" },
+  ];
+
+  const handleChange = (e) => {
+    const newLeagueValue = e.target.value;
+    setSelectedLeague(newLeagueValue);
+  };
+
+  const fetchLeagueData = async () => {
     const options = {
       method: "GET",
       url: "https://api-football-v1.p.rapidapi.com/v3/standings",
       params: {
         season: "2023",
-        league: "39",
+        league: selectedLeague,
       },
       headers: {
         "X-RapidAPI-Key": "fc6d37421fmsh1063f0ca2854726p107fecjsn9c5340af29ad",
@@ -23,36 +36,49 @@ export const Standings = () => {
       const response = await axios.request(options);
       const clubs = response.data.response[0].league.standings[0];
       console.log(clubs);
-      setEpl(
-        <table className="border-solid">
+      setLeagueData(
+        <table className="bg-slate-500" style={{fontFamily :"'Hubballi', sans-serif", fontSize:"25px" }}>
           <thead>
-            <tr className=" border-solid border-indigo-600">
-              <th>position</th>
-              <th>club</th>
-              <th>points</th>
-              <th>Gd</th>
-              <th>played</th>
-              <th>W</th>
-              <th>D</th>
-              <th>L</th>
-              <th>form</th>
+            <tr>
+              <th className="px-1 text-white">Pos</th>
+              <th className="px-1 text-white text-left ">club</th>
+              <th className="px-1 text-white">Pts</th>
+              <th className="px-1 text-white">+/-</th>
+              <th className="px-1 text-white">P</th>
+              <th className="px-1 text-white">W</th>
+              <th className="px-1 text-white">D</th>
+              <th className="px-1 text-white">L</th>
+              <th className="px-1 text-white">form</th>
             </tr>
           </thead>
           <tbody>
             {clubs.map((club) => (
-              <tr key={club.team.id}>
-                <td>{club.rank}</td>
-                <td>{club.team.name}</td>
-                <td>{club.points}</td>
-                <td>{club.goalsDiff}</td>
-                <td>{club.all.played}</td>
-                <td>{club.all.win}</td>
-                <td>{club.all.draw}</td>
-                <td>{club.all.lose}</td>
-                <td>{club.form}</td>
+              <tr className={club.rank%2 == 0? "bg-slate-500 text-white": "bg-slate-600 text-white"
+              } key={club.team.id}
+              style={club.rank >17? {color:'red'}: {color: "white"}}
+              >
+                <td className="w-1/10">{club.rank}</td>
+                <td className="flex items-center w-1/10">
+                  <img
+                    src={club.team.logo}
+                    alt={club.team.name + " logo"}
+                    style={{ width: "10%" }}
+                  />
+                  <p className="mx-1 text-white" >{club.team.name}</p>
+                </td>
+                <td className="p-1 text-white"><p>{club.points}</p></td>
+                <td className="p-1 text-white"><p>{club.goalsDiff}</p></td>
+                <td className="p-1 text-white"><p>{club.all.played}</p></td>
+                <td className="p-1 text-white"><p>{club.all.win}</p></td>
+                <td className="p-1 text-white"><p>{club.all.lose}</p></td>
+                <td className="p-1 text-white"><p>{club.all.draw}</p></td>
+                <td className="p-1 text-white"><p>{club.form}</p></td>
               </tr>
             ))}
           </tbody>
+
+
+
         </table>
       );
     } catch (error) {
@@ -60,34 +86,20 @@ export const Standings = () => {
     }
   };
 
-
-
-  const fetchBundesliga = async()=>{
-    
-
-  }
-
   useEffect(() => {
-    fetchEplData();
-  }, []);
-
-
-
-
-
-
+    fetchLeagueData();
+  }, [selectedLeague]);
   return (
-    <>
-    <select name="" id="">
-        <option value="epl">Premier league</option>
-        <option value="bundesliga">Bundesliga</option>
-        <option value="champions">Champions League</option>
-    </select>
-    <div className="flex-col justify-center">
-      <h1>Todays Standings</h1>
-      {epl}
-      <p></p>
-    </div>
-    </>
+    <section className="flex flex-col justify-center items-center" style={{fontFamily :"'Hubballi', sans-serif" }}>
+      <select value={selectedLeague} onChange={handleChange}>
+        {leagueOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.league}
+          </option>
+        ))}
+      </select>
+        <h1>Latest Standings</h1>
+        {leagueData}
+    </section>
   );
 };
